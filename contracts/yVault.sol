@@ -330,14 +330,14 @@ contract yVault is ERC20, ERC20Detailed {
       if (_pool == 0) {
         shares = _amount;
       } else {
-        shares = (_amount.mul(totalSupply())).div(_pool);
+        shares = (_amount.mul(super.totalSupply())).div(_pool);
       }
       _mint(msg.sender, shares);
   }
 
   // No rebalance implementation for lower fees and faster swaps
-  function withdraw(uint _shares) external {
-      uint r = (balance().mul(_shares)).div(totalSupply());
+  function withdraw(uint r) external {
+      uint _shares = r.mul(super.totalSupply()).div(balance());
       _burn(msg.sender, _shares);
 
       // Check balance
@@ -356,6 +356,14 @@ contract yVault is ERC20, ERC20Detailed {
   }
 
   function getPricePerFullShare() public view returns (uint) {
-    return balance().mul(1e18).div(totalSupply());
+    return balance().mul(1e18).div(super.totalSupply());
+  }
+
+  function balanceOf(address account) public view returns (uint256) {
+      super.balanceOf(account).mul(balance()).div(super.totalSupply());
+  }
+
+  function totalSupply() public view returns (uint256) {
+      return balance();
   }
 }
